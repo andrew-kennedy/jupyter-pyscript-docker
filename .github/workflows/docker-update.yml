@@ -1,0 +1,44 @@
+name: Update Docker Image
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs every day at midnight
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/jupyter-pyscript:latest
+
+      - name: Check if the base image has been updated
+        id: base-image-check
+        run: |
+          LATEST_TAG=$(curl -s https://quay.io/api/v1/repository/jupyter/scipy-notebook/tag/?specificTag=latest | jq -r '.tags[0].name')
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
+          echo "::set-output name=triggered::true"
+
+      - name: Rebuild if base image updated
+        if: steps.base-image-check.outputs.triggered == 'true'
+        run: |
+          echo "Base image has been updated. Rebuilding..."
+          # Additional commands to rebuild your image can be added here.
