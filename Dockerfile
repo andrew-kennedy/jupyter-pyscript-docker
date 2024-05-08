@@ -1,5 +1,8 @@
 FROM quay.io/jupyter/scipy-notebook:latest
 
+# Install gettext for envsubst and other dependencies
+RUN apt-get update && apt-get install -y gettext-base
+
 # Install hass_pyscript_kernel and set up the pyscript kernel
 RUN pip install hass_pyscript_kernel \
     && jupyter pyscript install
