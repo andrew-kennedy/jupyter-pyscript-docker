@@ -15,4 +15,4 @@ RUN chown jovyan:users /usr/local/bin/entrypoint.sh
 USER jovyan
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["start-notebook.sh"]
+CMD ["start-notebook.py"]
