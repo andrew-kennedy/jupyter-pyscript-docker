@@ -1,7 +1,7 @@
 FROM quay.io/jupyter/scipy-notebook:latest
 
 # Install hass_pyscript_kernel and set up the pyscript kernel
-RUN pip install hass_pyscript_kernel \
+RUN pip install hass_pyscript_kernel plexapi \
     && jupyter pyscript install
 
 # Add the entrypoint script
